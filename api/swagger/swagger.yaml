@@ -1,0 +1,104 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Hello World App
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /users/{userId}/details:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: users
+    get:
+      description: Returns user details
+      # used as the method name of the controller
+      operationId: userDetails
+      parameters:
+        - name: userId
+          in: path
+          type: integer
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              data:
+                # a pointer to a definition
+                $ref: "#/definitions/UserDetailsSchema"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorSchema"
+  /users/{userId}/media:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: users
+    get:
+      description: Returns user details
+      # used as the method name of the controller
+      operationId: userMedia
+      parameters:
+        - name: userId
+          in: path
+          type: integer
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  # a pointer to a definition
+                  $ref: "#/definitions/UserMediaSchema"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorSchema"
+  
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  UserDetailsSchema:
+    properties:
+      id:
+        type: number
+      cover_img:
+        type: string
+      profile_img: 
+        type: string
+      full_name: 
+        type: string
+        
+  UserMediaSchema:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - "video"
+          - "image"
+  ErrorSchema:
+    required:
+      - message
+    properties:
+      message:
+        type: string

@@ -1,0 +1,30 @@
+[  
+    {  
+       "id":"user_74389",
+       "profile_img":"https://fsd1.herokuapp.com/images/user_2.png",
+       "cover_img":"https://fsd1.herokuapp.com/images/timeline.png",
+       "full_name":"Joseph Carn",
+       "user_bio":"music lover, singer and dancer",
+       "user_name":"josephcarn234",
+       "user_email":"joseph_carn@gmail.com",
+       "stats":{  
+          "tweets":345,
+          "followers":13,
+          "following":2
+       }
+    },
+    {  
+       "id":"user_534",
+       "profile_img":"https://fsd1.herokuapp.com/images/user_2.png",
+       "cover_img":"https://fsd1.herokuapp.com/images/timeline.png",
+       "full_name":"Alvin Mark",
+       "user_bio":"music lover, singer and dancer",
+       "user_name":"alvinmark_12",
+       "user_email":"alvin_mark_1992@gmail.com",
+       "stats":{  
+          "tweets":456,
+          "followers":234,
+          "following":123
+       }
+    }
+ ]
