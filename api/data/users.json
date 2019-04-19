@@ -49,7 +49,7 @@
         "user_birthday": 797625000000,
         "user_from": "Bangalore, India",
         "user_website": "http://example.com",
-        "following": [1],
+        "following": [2],
         "stats":{  
            "tweets":456,
            "followers":234,
