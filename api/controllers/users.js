@@ -2,6 +2,9 @@ const users = require('../data/users.json')
 const media = require('../data/media.json')
 const tweets = require('../data/tweets.json')
 
+/**
+ * Get a particular user's details
+ */
 function userDetails(req, res) {
     const userId = Number(req.swagger.params.userId.value)
     const targetUser = users.find(u => u.id === userId)
@@ -17,6 +20,9 @@ function userDetails(req, res) {
     })
 }
 
+/**
+ * Photos and videos shared by the user
+ */
 function userMedia(req, res) {
     const userId = Number(req.swagger.params.userId.value)
     const userData = users.find(u => u.id === userId)
@@ -31,6 +37,9 @@ function userMedia(req, res) {
     return res.json({ data: results })
 }
 
+/**
+ * Suggest people for the user to follow
+ */
 function userFollowersSuggestions(req, res) {
     const userId = Number(req.swagger.params.userId.value)
     const userData = users.find(u => u.id === userId)
@@ -45,6 +54,25 @@ function userFollowersSuggestions(req, res) {
 
     return res.json({ data: suggestions })
 }
+
+
+/**
+ * Details of the people the user is following
+ */
+function userFollowing(req, res) {
+    const userId = Number(req.swagger.params.userId.value)
+    const userData = users.find(u => u.id === userId)
+    if(!userData) {
+        return res.status(400).json({
+            message: "User with the given ID does not exist"
+        })
+    }
+
+    const currentlyFollowing = userData.following || []
+    const data = users.filter(u => currentlyFollowing.includes(u.id))
+    return res.json({ data })
+}
+
 
 /**
  * Tweets made by the people the user is following
@@ -66,6 +94,9 @@ function userFollowingTweets(req, res) {
     return res.json({ data })
 }
 
+/**
+ * Get the tweets made by a user
+ */
 function userTweets(req, res) {
     const userId = Number(req.swagger.params.userId.value)
     const userData = users.find(u => u.id === userId)
@@ -87,5 +118,6 @@ module.exports = {
     userMedia,
     userFollowersSuggestions,
     userFollowingTweets,
+    userFollowing,
     userTweets
 }

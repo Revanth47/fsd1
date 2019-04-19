@@ -117,6 +117,28 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorSchema"
+  /users/{userId}/following:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: users
+    get:
+      description: Fetch suggestions of people the user can follow
+      # used as the method name of the controller
+      operationId: userFollowing
+      parameters:
+        - name: userId
+          in: path
+          type: integer
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorSchema"
   /users/{userId}/following/tweets:
     # binds a127 app logic to a route
     x-swagger-router-controller: users
