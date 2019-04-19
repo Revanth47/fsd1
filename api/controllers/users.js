@@ -66,9 +66,26 @@ function userFollowingTweets(req, res) {
     return res.json({ data })
 }
 
+function userTweets(req, res) {
+    const userId = Number(req.swagger.params.userId.value)
+    const userData = users.find(u => u.id === userId)
+    if(!userData) {
+        return res.status(400).json({
+            message: "User with the given ID does not exist"
+        })
+    }
+
+    const data = tweets.filter(t => t.userId === userId).map(t => ({
+        ...t,
+        user: users.find(u => u.id === t.userId) || {}
+    }))
+    return res.json({ data })
+}
+
 module.exports = {
     userDetails,
     userMedia,
     userFollowersSuggestions,
-    userFollowingTweets
+    userFollowingTweets,
+    userTweets
 }

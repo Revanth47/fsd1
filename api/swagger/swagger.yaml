@@ -18,6 +18,29 @@ consumes:
 produces:
   - application/json
 paths:
+  /users/{userId}/tweets:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: users
+    get:
+      description: Get Tweets made by the user
+      # used as the method name of the controller
+      operationId: userTweets
+      parameters:
+        - name: userId
+          in: path
+          type: integer
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorSchema"
+  
   /users/{userId}/details:
     # binds a127 app logic to a route
     x-swagger-router-controller: users
