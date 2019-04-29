@@ -14,7 +14,7 @@ module.exports = [
             "media": [
                 {
                     "type": "video",
-                    "link": "https://fsd1.herokuapp.com/videos/media_3.mp4"
+                    "link": `https://${process.env.HEROKU_APP_NAME}.herokuapp.com/videos/media_3.mp4`
                 }
             ]
         },
@@ -34,7 +34,7 @@ module.exports = [
             "media": [
                 {
                     "type": "image",
-                    "link": "https://fsd1.herokuapp.com/images/media_1.png"
+                    "link": `https://${process.env.HEROKU_APP_NAME}.herokuapp.com/images/media_1.png`
                 }
             ]
         },
