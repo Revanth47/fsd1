@@ -1,6 +1,6 @@
-const users = require('../data/users.json')
-const media = require('../data/media.json')
-const tweets = require('../data/tweets.json')
+const users = require('../data/users.js')
+const media = require('../data/media.js')
+const tweets = require('../data/tweets.js')
 
 /**
  * Get a particular user's details
