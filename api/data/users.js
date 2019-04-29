@@ -1,4 +1,4 @@
-[
+module.exports = [
     {
         "id": 1,
         "profile_img": `https://${process.env.HEROKU_APP_NAME}.herokuapp.com/images/user_1.png`,

@@ -1,4 +1,4 @@
-[
+module.exports = [
     {
         "user_id": 1,
         "media_id": 1,

@@ -1,4 +1,4 @@
-[
+module.exports = [
     {
         "id": "tweet_1232",
         "text": "Hey there, How are you.",
