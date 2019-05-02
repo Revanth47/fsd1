@@ -1,10 +1,17 @@
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
+const autoIncrement = require("mongoose-auto-increment");
+
+autoIncrement.initialize(mongoose.connection);
 
 const saltRounds = 10;
 
 const userSchema = new mongoose.Schema({
-  id: Number,
+  id: {
+    type: Number,
+    unique: true,
+    required: true
+  },
   profile_img: {
     type: String,
     default: ""
@@ -23,15 +30,20 @@ const userSchema = new mongoose.Schema({
   },
   user_name: {
     type: String,
-    default: ""
+    default: "",
+    required: true,
+    unique: true
   },
   user_pass: {
     type: String,
+    required: true,
     default: ""
   },
   user_email: {
     type: String,
-    default: ""
+    required: true,
+    default: "",
+    unique: true
   },
   user_created_at: {
     type: Number,
@@ -67,6 +79,12 @@ const userSchema = new mongoose.Schema({
 userSchema.pre("save", function(next) {
   this.user_pass = bcrypt.hashSync(this.user_pass, saltRounds);
   next();
+});
+
+userSchema.plugin(autoIncrement.plugin, {
+  model: "User",
+  field: "id",
+  startAt: 50
 });
 
 module.exports = mongoose.model("User", userSchema);

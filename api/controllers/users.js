@@ -6,16 +6,21 @@ function createUser(req, res, next) {
   const userObj = {
     user_name: req.body.user_name,
     user_email: req.body.user_email,
-    user_pass: req.body.user_pass
+    user_pass: req.body.user_pass,
+    profile_img: `https://fsd1.herokuapp.com/images/user_2.png`,
+    following: [1, 2]
   };
-  userModel.create(userObj, function(err) {
+  userModel.create(userObj, function(err, data) {
     if (err) next(err);
-    else
+    else {
       res.json({
         status: "success",
         message: "User added successfully!!!",
-        data: null
+        data: {
+          userId: data.id
+        }
       });
+    }
   });
 }
 

@@ -11,6 +11,7 @@
     "bcrypt": "^3.0.6",
     "express": "^4.12.3",
     "mongoose": "^5.5.4",
+    "mongoose-auto-increment": "^5.0.1",
     "pm2": "^3.5.0",
     "swagger": "^0.7.5",
     "swagger-editor": "^3.6.27",

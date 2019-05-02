@@ -3,6 +3,8 @@
 var SwaggerExpress = require("swagger-express-mw");
 const mongoose = require("mongoose");
 const express = require("express");
+const autoIncrement = require("mongoose-auto-increment");
+
 const app = express();
 module.exports = app; // for testing
 
@@ -14,7 +16,10 @@ mongoose.set("debug", true);
 console.log(111, process.env.DATABASE_URL);
 mongoose
   .connect(`${process.env.DATABASE_URL}`)
-  .then(() => console.log("MongoDB connected…"))
+  .then(() => {
+    autoIncrement.initialize(mongoose.connection);
+    console.log("MongoDB connected…");
+  })
   .catch(err => console.log(err));
 
 SwaggerExpress.create(config, function(err, swaggerExpress) {
