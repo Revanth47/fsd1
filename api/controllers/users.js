@@ -2,12 +2,16 @@ const userModel = require("../models/user");
 const tweetModel = require("../models/tweet");
 const bcrypt = require("bcrypt");
 
+/**
+ * user sign up method
+ */
 function createUser(req, res, next) {
   const userObj = {
     user_name: req.body.user_name,
     user_email: req.body.user_email,
     user_pass: req.body.user_pass,
     profile_img: `https://fsd1.herokuapp.com/images/user_2.png`,
+    cover_img: `https://fsd1.herokuapp.com/images/timeline.png`,
     following: [1, 2]
   };
   userModel.create(userObj, function(err, data) {
@@ -24,6 +28,9 @@ function createUser(req, res, next) {
   });
 }
 
+/**
+ * User login method
+ */
 function authenticateUser(req, res, next) {
   userModel.findOne({ user_email: req.body.user_email }, function(
     err,
@@ -45,6 +52,53 @@ function authenticateUser(req, res, next) {
         });
       }
     }
+  });
+}
+
+/**
+ * User profile update method
+ */
+function editProfile(req, res, next) {
+  const userId = Number(req.swagger.params.userId.value);
+  userModel.findOne({ id: userId }, function(err, user) {
+    if (err) {
+      next(err);
+      return;
+    } else if (!user) {
+      return res.status(400).json({
+        message: "User with the given ID does not exist"
+      });
+    }
+    const params = req.swagger.params;
+    if (params.user_name.value) {
+      user.user_name = params.user_name.value;
+    }
+    if (params.user_email.value) {
+      user.user_email = params.user_email.value;
+    }
+    if (params.user_website.value) {
+      user.user_website = params.user_website.value;
+    }
+    if (params.user_from.value) {
+      user.user_from = params.user_from.value;
+    }
+    if (params.user_birthday.value) {
+      user.user_birthday = params.user_birthday.value;
+    }
+    if (params.full_name.value) {
+      user.full_name = params.full_name.value;
+    }
+    user.save(function(err) {
+      if (err) {
+        next(err);
+        return;
+      }
+
+      return res.json({
+        status: "success",
+        message: "Successfully updated user's profile"
+      });
+    });
   });
 }
 
@@ -84,6 +138,7 @@ function userMedia(req, res, next) {
       },
       { $unwind: "$_id" }
     ])
+    .limit(10)
     .exec(function(err, mediaInfo) {
       if (err) {
         next(err);
@@ -113,18 +168,17 @@ function userFollowersSuggestions(req, res, next) {
       });
     }
     const excludeUsersList = [userId, ...(user.following || [])];
-    userModel.find(
-      { id: { $nin: excludeUsersList } },
-      "-user_pass -_id",
-      function(err, data) {
+    userModel
+      .find({ id: { $nin: excludeUsersList } }, "-user_pass -_id")
+      .limit(5)
+      .exec(function(err, data) {
         if (err) {
           next(err);
           return;
         }
 
         return res.json({ status: "success", data });
-      }
-    );
+      });
   });
 }
 
@@ -143,18 +197,17 @@ function userFollowing(req, res, next) {
       });
     }
     const includeUsersList = user.following || [];
-    userModel.find(
-      { id: { $in: includeUsersList } },
-      "-user_pass -_id",
-      function(err, data) {
+    userModel
+      .find({ id: { $in: includeUsersList } }, "-user_pass -_id")
+      .limit(10)
+      .exec(function(err, data) {
         if (err) {
           next(err);
           return;
         }
 
         return res.json({ status: "success", data });
-      }
-    );
+      });
   });
 }
 
@@ -175,6 +228,7 @@ function userFollowingTweets(req, res, next) {
     const includeUsersList = user.following || [];
     tweetModel
       .find({ userId: { $in: includeUsersList } })
+      .limit(10)
       .populate("user", "-user_pass")
       .exec(function(err, data) {
         if (err) {
@@ -202,6 +256,7 @@ function userTweets(req, res, next) {
     }
     tweetModel
       .find({ userId })
+      .limit(10)
       .populate("user", "-user_pass")
       .exec(function(err, data) {
         if (err) {
@@ -227,18 +282,17 @@ function userFollowers(req, res, next) {
       });
     }
     const searchQuery = new RegExp(query, "i");
-    userModel.find(
-      { user_name: searchQuery, following: userId },
-      "-user_pass",
-      function(err, data) {
+    userModel
+      .find({ user_name: searchQuery, following: userId }, "-user_pass")
+      .limit(10)
+      .exec(function(err, data) {
         if (err) {
           next(err);
           return;
         }
 
         return res.json({ status: "success", data });
-      }
-    );
+      });
   });
 }
 
@@ -251,5 +305,6 @@ module.exports = {
   userFollowingTweets,
   userFollowing,
   userTweets,
-  userFollowers
+  userFollowers,
+  editProfile
 };

@@ -89,6 +89,58 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorSchema"
+  /users/{userId}/profile:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: users
+    put:
+      description: Update user profile
+      # used as the method name of the controller
+      operationId: editProfile
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: userId
+          in: path
+          type: integer
+          minimum: 4
+          required: true
+        - in: formData
+          name: profile_img
+          type: file
+        - in: formData
+          name: user_name
+          type: string
+        - in: formData
+          name: user_email
+          type: string
+          format: email
+          pattern: (?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
+        - in: formData
+          name: full_name
+          type: string
+        - in: formData
+          name: user_birthday
+          type: number
+        - in: formData
+          name: cover_img
+          type: file
+        - in: formData
+          name: user_from
+          type: string
+        - in: formData
+          name: user_website
+          type: string
+          format: uri
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorSchema"
 
   /users/{userId}/tweets:
     # binds a127 app logic to a route
