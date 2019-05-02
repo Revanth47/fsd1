@@ -9,6 +9,7 @@ module.exports = app; // for testing
 var config = {
   appRoot: __dirname // required config
 };
+mongoose.set("debug", true);
 
 console.log(111, process.env.DATABASE_URL);
 mongoose

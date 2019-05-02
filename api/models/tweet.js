@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-
-const tweetSchema = new mongoose.Schema({
+const Schema = mongoose.Schema;
+const tweetSchema = new Schema({
   id: String,
   text: {
     type: String,
@@ -20,8 +20,12 @@ const tweetSchema = new mongoose.Schema({
     ],
     media: [
       {
-        type: String,
-        link: String
+        type: {
+          type: String,
+          enum: ["video", "image"]
+        },
+        link: String,
+        url: String
       }
     ]
   },
@@ -38,6 +42,10 @@ const tweetSchema = new mongoose.Schema({
       type: Number,
       default: 0
     }
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
   }
 });
 

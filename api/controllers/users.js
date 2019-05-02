@@ -6,7 +6,7 @@ function createUser(req, res, next) {
   const userObj = {
     user_name: req.body.user_name,
     user_email: req.body.user_email,
-    user_password: req.body.user_password
+    user_pass: req.body.user_pass
   };
   userModel.create(userObj, function(err) {
     if (err) next(err);
@@ -67,24 +67,36 @@ function userDetails(req, res, next) {
 /**
  * Photos and videos shared by the user
  */
-function userMedia(req, res) {
+function userMedia(req, res, next) {
   const userId = Number(req.swagger.params.userId.value);
-  tweetModel.find({ userId }, "entities.media", function(err, mediaInfo) {
-    if (!err) {
-      return res.json({ status: "success", data: mediaInfo });
-    } else if (!mediaInfo) {
-      return res.status(400).json({
-        message: "User with the given ID does not exist"
-      });
-    }
-    next(err);
-  });
+  tweetModel
+    .aggregate([
+      { $match: { userId } },
+      {
+        $group: {
+          _id: "$entities.media"
+        }
+      },
+      { $unwind: "$_id" }
+    ])
+    .exec(function(err, mediaInfo) {
+      if (err) {
+        next(err);
+        return;
+      } else if (!mediaInfo) {
+        return res.status(400).json({
+          message: "User with the given ID does not exist"
+        });
+      }
+      const data = mediaInfo.map(d => d._id);
+      return res.json({ status: "success", data });
+    });
 }
 
 /**
  * Suggest people for the user to follow
  */
-function userFollowersSuggestions(req, res) {
+function userFollowersSuggestions(req, res, next) {
   const userId = Number(req.swagger.params.userId.value);
   userModel.findOne({ id: userId }, "following", function(err, user) {
     if (err) {
@@ -95,9 +107,9 @@ function userFollowersSuggestions(req, res) {
         message: "User with the given ID does not exist"
       });
     }
-    const exludeUsersList = (user.following || []).push(userId);
-    userModal.find(
-      { id: { $nin: exludeUsersList } },
+    const excludeUsersList = [userId, ...(user.following || [])];
+    userModel.find(
+      { id: { $nin: excludeUsersList } },
       "-user_pass -_id",
       function(err, data) {
         if (err) {
@@ -114,7 +126,7 @@ function userFollowersSuggestions(req, res) {
 /**
  * Details of the people the user is following
  */
-function userFollowing(req, res) {
+function userFollowing(req, res, next) {
   const userId = Number(req.swagger.params.userId.value);
   userModel.findOne({ id: userId }, "following", function(err, user) {
     if (err) {
@@ -126,7 +138,7 @@ function userFollowing(req, res) {
       });
     }
     const includeUsersList = user.following || [];
-    userModal.find(
+    userModel.find(
       { id: { $in: includeUsersList } },
       "-user_pass -_id",
       function(err, data) {
@@ -144,7 +156,7 @@ function userFollowing(req, res) {
 /**
  * Tweets made by the people the user is following
  */
-function userFollowingTweets(req, res) {
+function userFollowingTweets(req, res, next) {
   const userId = Number(req.swagger.params.userId.value);
   userModel.findOne({ id: userId }, function(err, user) {
     if (err) {
@@ -156,21 +168,23 @@ function userFollowingTweets(req, res) {
       });
     }
     const includeUsersList = user.following || [];
-    tweetModel.find({ userId: { $in: includeUsersList } }, function(err, data) {
-      if (err) {
-        next(err);
-        return;
-      }
-
-      return res.json({ status: "success", data });
-    });
+    tweetModel
+      .find({ userId: { $in: includeUsersList } })
+      .populate("user", "-user_pass")
+      .exec(function(err, data) {
+        if (err) {
+          next(err);
+          return;
+        }
+        return res.json({ status: "success", data });
+      });
   });
 }
 
 /**
  * Get the tweets made by a user
  */
-function userTweets(req, res) {
+function userTweets(req, res, next) {
   const userId = Number(req.swagger.params.userId.value);
   userModel.findOne({ id: userId }, function(err, user) {
     if (err) {
@@ -181,18 +195,21 @@ function userTweets(req, res) {
         message: "User with the given ID does not exist"
       });
     }
-    tweetModel.find({ userId }, function(err, data) {
-      if (err) {
-        next(err);
-        return;
-      }
+    tweetModel
+      .find({ userId })
+      .populate("user", "-user_pass")
+      .exec(function(err, data) {
+        if (err) {
+          next(err);
+          return;
+        }
 
-      return res.json({ status: "success", data });
-    });
+        return res.json({ status: "success", data });
+      });
   });
 }
 
-function userFollowers(req, res) {
+function userFollowers(req, res, next) {
   const query = req.swagger.params.query.value || "";
   const userId = Number(req.swagger.params.userId.value);
   userModel.findOne({ id: userId }, function(err, user) {
@@ -205,17 +222,18 @@ function userFollowers(req, res) {
       });
     }
     const searchQuery = new RegExp(query, "i");
-    userModel.find({ user_name: searchQuery }, "-user_pass", function(
-      err,
-      data
-    ) {
-      if (err) {
-        next(err);
-        return;
-      }
+    userModel.find(
+      { user_name: searchQuery, following: userId },
+      "-user_pass",
+      function(err, data) {
+        if (err) {
+          next(err);
+          return;
+        }
 
-      return res.json({ status: "success", data });
-    });
+        return res.json({ status: "success", data });
+      }
+    );
   });
 }
 

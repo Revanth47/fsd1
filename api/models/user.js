@@ -65,7 +65,7 @@ const userSchema = new mongoose.Schema({
 
 // hash user password before saving into database
 userSchema.pre("save", function(next) {
-  this.password = bcrypt.hashSync(this.password, saltRounds);
+  this.user_pass = bcrypt.hashSync(this.user_pass, saltRounds);
   next();
 });
 
